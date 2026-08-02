@@ -1,0 +1,5 @@
+.build/
+.swiftpm/
+ActionsBar.app/
+*.xcodeproj/xcuserdata/
+DerivedData/
