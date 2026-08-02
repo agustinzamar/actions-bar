@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build + run ActionsBar, rebuild+relaunch on source changes.
 set -euo pipefail
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 if ! command -v fswatch >/dev/null 2>&1; then
   echo "fswatch required: brew install fswatch" >&2
