@@ -1,5 +1,5 @@
-import Foundation
 import Combine
+import Foundation
 
 /// Per-repo notification override.
 struct RepoNotificationRule: Codable {
@@ -13,21 +13,29 @@ final class AppSettings: ObservableObject {
     @Published var watchedRepos: [RepoRef] {
         didSet { persist(watchedRepos, key: .watchedRepos) }
     }
+
     @Published var pollInterval: TimeInterval {
         didSet { UserDefaults.standard.set(pollInterval, forKey: Keys.pollInterval.rawValue) }
     }
+
     @Published var enabledEvents: Set<NotificationEvent> {
         didSet { persist(Array(enabledEvents), key: .enabledEvents) }
     }
+
     @Published var soundEnabled: Bool {
         didSet { UserDefaults.standard.set(soundEnabled, forKey: Keys.soundEnabled.rawValue) }
     }
+
+    @Published var autoFetchEnabled: Bool {
+        didSet { UserDefaults.standard.set(autoFetchEnabled, forKey: Keys.autoFetchEnabled.rawValue) }
+    }
+
     @Published private var repoRules: [String: RepoNotificationRule] {
         didSet { persist(repoRules, key: .repoRules) }
     }
 
     private enum Keys: String {
-        case watchedRepos, pollInterval, enabledEvents, soundEnabled, repoRules
+        case watchedRepos, pollInterval, enabledEvents, soundEnabled, repoRules, autoFetchEnabled
     }
 
     init() {
@@ -37,10 +45,13 @@ final class AppSettings: ObservableObject {
         let events = Self.load([NotificationEvent].self, key: .enabledEvents) ?? [.failure, .fixed]
         enabledEvents = Set(events)
         soundEnabled = defaults.object(forKey: Keys.soundEnabled.rawValue) as? Bool ?? true
+        autoFetchEnabled = defaults.object(forKey: Keys.autoFetchEnabled.rawValue) as? Bool ?? true
         repoRules = Self.load([String: RepoNotificationRule].self, key: .repoRules) ?? [:]
     }
 
-    func isEventEnabled(_ event: NotificationEvent) -> Bool { enabledEvents.contains(event) }
+    func isEventEnabled(_ event: NotificationEvent) -> Bool {
+        enabledEvents.contains(event)
+    }
 
     func repoRule(for repo: RepoRef) -> RepoNotificationRule {
         repoRules[repo.id] ?? RepoNotificationRule()
@@ -60,12 +71,12 @@ final class AppSettings: ObservableObject {
         repoRules.removeValue(forKey: repo.id)
     }
 
-    private func persist<T: Codable>(_ value: T, key: Keys) {
+    private func persist(_ value: some Codable, key: Keys) {
         guard let data = try? JSONEncoder().encode(value) else { return }
         UserDefaults.standard.set(data, forKey: key.rawValue)
     }
 
-    private static func load<T: Codable>(_ type: T.Type, key: Keys) -> T? {
+    private static func load<T: Codable>(_: T.Type, key: Keys) -> T? {
         guard let data = UserDefaults.standard.data(forKey: key.rawValue) else { return nil }
         return try? JSONDecoder().decode(T.self, from: data)
     }

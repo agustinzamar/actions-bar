@@ -1,5 +1,5 @@
-import Foundation
 import Combine
+import Foundation
 
 @MainActor
 final class AppState: ObservableObject {
@@ -7,11 +7,11 @@ final class AppState: ObservableObject {
     var auth = DeviceFlowAuth()
     @Published private(set) var isSignedIn: Bool
 
-    private(set) lazy var poller: RunsPoller = RunsPoller(
+    private(set) lazy var poller: RunsPoller = .init(
         client: GitHubClient(token: { KeychainStore.loadToken() }),
         onTransition: { [weak self] repo, from, to in
             guard let self else { return }
-            NotificationManager.shared.notifyIfNeeded(repo: repo, from: from, to: to, settings: self.settings)
+            NotificationManager.shared.notifyIfNeeded(repo: repo, from: from, to: to, settings: settings)
         }
     )
 
@@ -28,14 +28,18 @@ final class AppState: ObservableObject {
         auth.$state
             .sink { [weak self] state in
                 guard let self, state == .success else { return }
-                self.isSignedIn = true
-                self.restartPolling()
+                isSignedIn = true
+                restartPolling()
             }
             .store(in: &cancellables)
 
         settings.$watchedRepos
             .combineLatest(settings.$pollInterval)
             .sink { [weak self] _, _ in self?.restartPolling() }
+            .store(in: &cancellables)
+
+        settings.$autoFetchEnabled
+            .sink { [weak self] _ in self?.restartPolling() }
             .store(in: &cancellables)
 
         // settings/auth/poller are separate ObservableObjects; views only hold
@@ -65,7 +69,10 @@ final class AppState: ObservableObject {
     }
 
     private func restartPolling() {
-        guard isSignedIn else { return }
+        guard isSignedIn, settings.autoFetchEnabled else {
+            poller.stop()
+            return
+        }
         poller.start(repos: settings.watchedRepos, interval: settings.pollInterval)
     }
 }

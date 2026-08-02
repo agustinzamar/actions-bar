@@ -1,5 +1,5 @@
-import SwiftUI
 import AppKit
+import SwiftUI
 
 struct MenuContentView: View {
     @EnvironmentObject var appState: AppState
@@ -29,14 +29,51 @@ struct MenuContentView: View {
 
             Divider()
 
-            Button("Settings…") {
-                NSApp.activate(ignoringOtherApps: true)
-                openSettings()
-            }
-            Button("Quit") { NSApplication.shared.terminate(nil) }
+            footer
         }
         .padding(12)
-        .frame(minWidth: 260)
+        .frame(minWidth: 280)
+    }
+
+    private var footer: some View {
+        HStack(spacing: 10) {
+            Toggle("Auto-fetch", isOn: $appState.settings.autoFetchEnabled)
+                .toggleStyle(.switch)
+                .labelsHidden()
+            Text("Auto-fetch")
+                .font(.caption)
+
+            Spacer()
+
+            Label(lastFetchedText, systemImage: "clock")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .labelStyle(.titleAndIcon)
+
+            Spacer()
+
+            Button {
+                NSApp.activate(ignoringOtherApps: true)
+                openSettings()
+            } label: {
+                Image(systemName: "gearshape")
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                NSApplication.shared.terminate(nil)
+            } label: {
+                Image(systemName: "power")
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var lastFetchedText: String {
+        guard let last = appState.poller.lastFetched else { return "Never fetched" }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+        return formatter.localizedString(for: last, relativeTo: Date())
     }
 
     /// No settings or repo picker here on purpose — nothing to configure until signed in.

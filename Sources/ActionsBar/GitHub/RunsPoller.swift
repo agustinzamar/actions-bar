@@ -1,10 +1,11 @@
-import Foundation
 import Combine
+import Foundation
 
 /// Polls watched repos on a timer and publishes latest run state + status transitions.
 @MainActor
 final class RunsPoller: ObservableObject {
     @Published private(set) var repoStates: [String: RepoRunState] = [:]
+    @Published private(set) var lastFetched: Date?
 
     private var timer: Timer?
     private let client: GitHubClient
@@ -54,5 +55,6 @@ final class RunsPoller: ObservableObject {
                 )
             }
         }
+        lastFetched = Date()
     }
 }
