@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 final class AppState: ObservableObject {
     var settings = AppSettings()
-    var auth = DeviceFlowAuth()
+    var auth = PATAuth()
     @Published private(set) var isSignedIn: Bool
 
     private(set) lazy var poller: RunsPoller = .init(

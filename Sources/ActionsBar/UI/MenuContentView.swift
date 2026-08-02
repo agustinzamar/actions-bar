@@ -4,7 +4,7 @@ import SwiftUI
 struct MenuContentView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.openSettings) private var openSettings
-    @Environment(\.openWindow) private var openWindow
+    @State private var tokenText = ""
 
     var body: some View {
         Group {
@@ -74,20 +74,42 @@ struct MenuContentView: View {
     }
 
     /// No settings or repo picker here on purpose — nothing to configure until signed in.
-    /// Sign-in itself happens in a separate real window (see SignInCodeView) because
-    /// this popover auto-dismisses the instant focus shifts to the browser.
     private var signedOutView: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "chart.bar.fill")
-                .font(.system(size: 28))
+        VStack(spacing: 14) {
+            GitHubMarkIcon(size: 32)
                 .foregroundStyle(.secondary)
                 .padding(.top, 8)
 
-            GitHubSignInButton {
-                appState.auth.start()
-                NSApp.activate(ignoringOtherApps: true)
-                openWindow(id: "sign-in")
+            Text("Sign in with a GitHub token")
+                .font(.headline)
+
+            SecureField("Personal access token", text: $tokenText)
+                .textFieldStyle(.roundedBorder)
+                .frame(width: 240)
+                .onSubmit(signIn)
+
+            Button("Sign In", action: signIn)
+                .buttonStyle(.borderedProminent)
+                .disabled(tokenText.isEmpty || appState.auth.state == .validating)
+
+            switch appState.auth.state {
+            case .validating:
+                ProgressView().controlSize(.small)
+            case let .failed(message):
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .multilineTextAlignment(.center)
+            case .idle, .success:
+                EmptyView()
             }
+
+            Button("Create a token on GitHub") {
+                NSWorkspace.shared.open(URL(string: "https://github.com/settings/tokens/new?scopes=repo,workflow&description=ActionsBar")!)
+            }
+            .buttonStyle(.plain)
+            .font(.caption)
+            .foregroundStyle(.secondary)
 
             Divider()
 
@@ -98,6 +120,10 @@ struct MenuContentView: View {
         }
         .padding(20)
         .frame(width: 300)
+    }
+
+    private func signIn() {
+        appState.auth.signIn(token: tokenText)
     }
 
     private func repoRow(_ repo: RepoRef) -> some View {

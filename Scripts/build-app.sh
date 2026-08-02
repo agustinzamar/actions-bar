@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 CONFIG="${1:-debug}"
-swift build -c "$CONFIG"
+swift build -c "$CONFIG" --target ActionsBar
 BIN_PATH=$(swift build -c "$CONFIG" --show-bin-path)
 
 APP="ActionsBar.app"
