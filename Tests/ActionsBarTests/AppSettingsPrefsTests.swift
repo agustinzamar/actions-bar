@@ -1,5 +1,5 @@
-import XCTest
 @testable import ActionsBar
+import XCTest
 
 @MainActor
 final class AppSettingsPrefsTests: XCTestCase {

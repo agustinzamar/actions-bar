@@ -14,6 +14,6 @@ let package = Package(
             name: "ActionsBarTests",
             dependencies: ["ActionsBar"],
             path: "Tests/ActionsBarTests"
-        )
+        ),
     ]
 )

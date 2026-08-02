@@ -1,5 +1,5 @@
-import XCTest
 @testable import ActionsBar
+import XCTest
 
 final class SyncStatusFormattingTests: XCTestCase {
     func test_neverSyncedWhenDateIsNil() {

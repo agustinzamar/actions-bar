@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Lint + format check, mirrors .github/workflows/lint.yml
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+if ! command -v swiftformat >/dev/null 2>&1 || ! command -v swiftlint >/dev/null 2>&1; then
+  echo "swiftformat/swiftlint required: brew install swiftformat swiftlint" >&2
+  exit 1
+fi
+
+echo "--- swiftformat ---"
+swiftformat --lint . || { echo "run: swiftformat ."; exit 1; }
+
+echo "--- swiftlint ---"
+swiftlint lint

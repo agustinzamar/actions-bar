@@ -8,9 +8,17 @@ protocol LaunchAtLoginControlling {
 }
 
 struct SMAppServiceLaunchAtLogin: LaunchAtLoginControlling {
-    var isRegistered: Bool { SMAppService.mainApp.status == .enabled }
-    func register() throws { try SMAppService.mainApp.register() }
-    func unregister() throws { try SMAppService.mainApp.unregister() }
+    var isRegistered: Bool {
+        SMAppService.mainApp.status == .enabled
+    }
+
+    func register() throws {
+        try SMAppService.mainApp.register()
+    }
+
+    func unregister() throws {
+        try SMAppService.mainApp.unregister()
+    }
 }
 
 @MainActor

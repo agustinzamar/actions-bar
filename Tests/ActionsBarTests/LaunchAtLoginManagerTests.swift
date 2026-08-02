@@ -1,5 +1,5 @@
-import XCTest
 @testable import ActionsBar
+import XCTest
 
 final class FakeLaunchAtLoginService: LaunchAtLoginControlling {
     var isRegistered = false
