@@ -15,6 +15,7 @@ final class NotificationManager {
 
     @MainActor
     func notifyIfNeeded(repo: RepoRef, from: RunStatus, to: RunStatus, settings: AppSettings) {
+        guard settings.notificationsEnabled else { return }
         guard let event = event(from: from, to: to) else { return }
 
         let rule = settings.repoRule(for: repo)
@@ -26,9 +27,9 @@ final class NotificationManager {
         content.title = repo.fullName
         content.body = body(for: event)
         if settings.soundEnabled {
-            content.sound = .default
+            content.sound = UNNotificationSound(named: UNNotificationSoundName("\(settings.soundName).aiff"))
         }
-        content.interruptionLevel = event == .failure ? .timeSensitive : .active
+        content.interruptionLevel = settings.respectFocusMode ? (event == .failure ? .timeSensitive : .active) : .timeSensitive
 
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
         UNUserNotificationCenter.current().add(request)

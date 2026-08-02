@@ -26,6 +26,18 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(soundEnabled, forKey: Keys.soundEnabled.rawValue) }
     }
 
+    @Published var notificationsEnabled: Bool {
+        didSet { UserDefaults.standard.set(notificationsEnabled, forKey: Keys.notificationsEnabled.rawValue) }
+    }
+
+    @Published var soundName: String {
+        didSet { UserDefaults.standard.set(soundName, forKey: Keys.soundName.rawValue) }
+    }
+
+    @Published var respectFocusMode: Bool {
+        didSet { UserDefaults.standard.set(respectFocusMode, forKey: Keys.respectFocusMode.rawValue) }
+    }
+
     @Published var autoFetchEnabled: Bool {
         didSet { UserDefaults.standard.set(autoFetchEnabled, forKey: Keys.autoFetchEnabled.rawValue) }
     }
@@ -35,7 +47,7 @@ final class AppSettings: ObservableObject {
     }
 
     private enum Keys: String {
-        case watchedRepos, pollInterval, enabledEvents, soundEnabled, repoRules, autoFetchEnabled
+        case watchedRepos, pollInterval, enabledEvents, soundEnabled, notificationsEnabled, soundName, respectFocusMode, repoRules, autoFetchEnabled
     }
 
     init() {
@@ -45,6 +57,9 @@ final class AppSettings: ObservableObject {
         let events = Self.load([NotificationEvent].self, key: .enabledEvents) ?? [.failure, .fixed]
         enabledEvents = Set(events)
         soundEnabled = defaults.object(forKey: Keys.soundEnabled.rawValue) as? Bool ?? true
+        notificationsEnabled = defaults.object(forKey: Keys.notificationsEnabled.rawValue) as? Bool ?? true
+        soundName = defaults.object(forKey: Keys.soundName.rawValue) as? String ?? "Pop"
+        respectFocusMode = defaults.object(forKey: Keys.respectFocusMode.rawValue) as? Bool ?? true
         autoFetchEnabled = defaults.object(forKey: Keys.autoFetchEnabled.rawValue) as? Bool ?? true
         repoRules = Self.load([String: RepoNotificationRule].self, key: .repoRules) ?? [:]
     }
@@ -69,6 +84,15 @@ final class AppSettings: ObservableObject {
     func removeRepo(_ repo: RepoRef) {
         watchedRepos.removeAll { $0.id == repo.id }
         repoRules.removeValue(forKey: repo.id)
+    }
+
+    func resetToDefaults() {
+        notificationsEnabled = true
+        enabledEvents = [.failure, .fixed]
+        soundEnabled = true
+        soundName = "Pop"
+        respectFocusMode = true
+        repoRules = [:]
     }
 
     private func persist(_ value: some Codable, key: Keys) {
