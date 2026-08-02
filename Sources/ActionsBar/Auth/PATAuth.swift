@@ -12,6 +12,7 @@ final class PATAuth: ObservableObject {
     }
 
     @Published private(set) var state: State = .idle
+    @Published private(set) var token: String?
 
     func signIn(token: String) {
         let trimmed = token.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -35,6 +36,7 @@ final class PATAuth: ObservableObject {
                     return
                 }
                 KeychainStore.save(token: trimmed)
+                self.token = trimmed
                 state = .success
             } catch {
                 state = .failed(error.localizedDescription)

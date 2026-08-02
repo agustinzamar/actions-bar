@@ -30,7 +30,7 @@ final class AppState: ObservableObject {
         auth.$state
             .sink { [weak self] state in
                 guard let self, state == .success else { return }
-                cachedToken = KeychainStore.loadToken()
+                cachedToken = auth.token
                 isSignedIn = true
                 restartPolling()
             }
