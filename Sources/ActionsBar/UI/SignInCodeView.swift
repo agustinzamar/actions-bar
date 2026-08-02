@@ -9,22 +9,28 @@ struct SignInCodeView: View {
 
     var body: some View {
         VStack(spacing: 16) {
+            if let info = appState.auth.codeInfo, appState.auth.state != .success {
+                VStack(spacing: 8) {
+                    Text("Enter this code on GitHub")
+                        .foregroundStyle(.secondary)
+                    Text(info.userCode)
+                        .font(.system(.largeTitle, design: .monospaced))
+                        .bold()
+                        .textSelection(.enabled)
+                    Text("Copied to your clipboard")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Button("Open github.com/login/device") {
+                        NSWorkspace.shared.open(info.verificationURL)
+                    }
+                }
+            }
+
             switch appState.auth.state {
             case .idle:
-                ProgressView("Requesting code…")
-            case .awaitingUser(let code, let url):
-                Text("Enter this code on GitHub")
-                    .foregroundStyle(.secondary)
-                Text(code)
-                    .font(.system(.largeTitle, design: .monospaced))
-                    .bold()
-                    .textSelection(.enabled)
-                Button("Open github.com/login/device") {
-                    NSWorkspace.shared.open(url)
+                if appState.auth.codeInfo == nil {
+                    ProgressView("Requesting code…")
                 }
-                Text("This should already be open in your browser.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             case .polling:
                 ProgressView("Waiting for you to authorize…")
             case .success:

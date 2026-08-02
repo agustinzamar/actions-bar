@@ -13,17 +13,24 @@ enum DeviceFlowError: Error, LocalizedError {
     }
 }
 
+struct DeviceCodeInfo: Equatable {
+    let userCode: String
+    let verificationURL: URL
+}
+
 @MainActor
 final class DeviceFlowAuth: ObservableObject {
     enum State: Equatable {
         case idle
-        case awaitingUser(userCode: String, verificationURL: URL)
         case polling
         case success
         case failed(String)
     }
 
     @Published private(set) var state: State = .idle
+    /// Kept separate from `state` so the code stays on screen for the whole
+    /// polling phase instead of being replaced the instant polling starts.
+    @Published private(set) var codeInfo: DeviceCodeInfo?
 
     private struct DeviceCodeResponse: Decodable {
         let deviceCode: String
@@ -55,6 +62,7 @@ final class DeviceFlowAuth: ObservableObject {
             return
         }
         state = .idle
+        codeInfo = nil
         Task {
             do {
                 let device = try await requestDeviceCode()
@@ -62,13 +70,20 @@ final class DeviceFlowAuth: ObservableObject {
                     state = .failed("Bad verification URL")
                     return
                 }
-                state = .awaitingUser(userCode: device.userCode, verificationURL: url)
+                codeInfo = DeviceCodeInfo(userCode: device.userCode, verificationURL: url)
+                copyToPasteboard(device.userCode)
+                state = .polling
                 NSWorkspace.shared.open(url)
                 try await poll(deviceCode: device.deviceCode, interval: device.interval, expiresIn: device.expiresIn)
             } catch {
                 state = .failed(error.localizedDescription)
             }
         }
+    }
+
+    private func copyToPasteboard(_ string: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(string, forType: .string)
     }
 
     private func requestDeviceCode() async throws -> DeviceCodeResponse {
@@ -86,7 +101,6 @@ final class DeviceFlowAuth: ObservableObject {
     }
 
     private func poll(deviceCode: String, interval: Int, expiresIn: Int) async throws {
-        state = .polling
         let deadline = Date().addingTimeInterval(TimeInterval(expiresIn))
         var currentInterval = interval
 
