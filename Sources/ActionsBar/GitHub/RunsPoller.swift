@@ -31,6 +31,10 @@ final class RunsPoller: ObservableObject {
         timer = nil
     }
 
+    func refreshNow(repos: [RepoRef]) {
+        Task { await pollOnce(repos: repos) }
+    }
+
     var aggregateStatus: RunStatus {
         repoStates.values.map(\.status).max() ?? .unknown
     }

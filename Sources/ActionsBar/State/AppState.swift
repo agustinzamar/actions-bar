@@ -62,6 +62,11 @@ final class AppState: ObservableObject {
         }
     }
 
+    func refreshNow() {
+        guard isSignedIn else { return }
+        poller.refreshNow(repos: settings.watchedRepos)
+    }
+
     func signOut() {
         KeychainStore.clear()
         isSignedIn = false

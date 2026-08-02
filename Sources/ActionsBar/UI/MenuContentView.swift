@@ -29,44 +29,41 @@ struct MenuContentView: View {
 
             Divider()
 
-            footer
+            HStack(spacing: 8) {
+                Toggle("Auto-fetch", isOn: $appState.settings.autoFetchEnabled)
+                    .toggleStyle(.switch)
+                    .controlSize(.mini)
+                    .labelsHidden()
+                Text("Auto-fetch")
+                    .font(.caption)
+                Spacer()
+                Text(lastFetchedText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 8)
+
+            Divider()
+
+            VStack(spacing: 2) {
+                MenuRow(icon: "arrow.clockwise", title: "Refresh", shortcutLabel: "⌘R", keyboardShortcut: KeyboardShortcut("r", modifiers: .command)) {
+                    appState.refreshNow()
+                }
+                MenuRow(icon: "gearshape", title: "Settings…", shortcutLabel: "⌘,", keyboardShortcut: KeyboardShortcut(",", modifiers: .command)) {
+                    NSApp.activate(ignoringOtherApps: true)
+                    openSettings()
+                }
+                MenuRow(icon: "info.circle", title: "About ActionsBar") {
+                    NSApp.activate(ignoringOtherApps: true)
+                    NSApp.orderFrontStandardAboutPanel(nil)
+                }
+                MenuRow(icon: "power", title: "Quit", shortcutLabel: "⌘Q", keyboardShortcut: KeyboardShortcut("q", modifiers: .command)) {
+                    NSApplication.shared.terminate(nil)
+                }
+            }
         }
         .padding(12)
         .frame(minWidth: 280)
-    }
-
-    private var footer: some View {
-        HStack(spacing: 10) {
-            Toggle("Auto-fetch", isOn: $appState.settings.autoFetchEnabled)
-                .toggleStyle(.switch)
-                .labelsHidden()
-            Text("Auto-fetch")
-                .font(.caption)
-
-            Spacer()
-
-            Label(lastFetchedText, systemImage: "clock")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .labelStyle(.titleAndIcon)
-
-            Spacer()
-
-            Button {
-                NSApp.activate(ignoringOtherApps: true)
-                openSettings()
-            } label: {
-                Image(systemName: "gearshape")
-            }
-            .buttonStyle(.plain)
-
-            Button {
-                NSApplication.shared.terminate(nil)
-            } label: {
-                Image(systemName: "power")
-            }
-            .buttonStyle(.plain)
-        }
     }
 
     private var lastFetchedText: String {
