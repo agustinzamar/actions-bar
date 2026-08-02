@@ -63,6 +63,14 @@ struct SettingsView: View {
         newRepoText = ""
     }
 
+    private var overriddenRepos: [RepoRef] {
+        appState.settings.watchedRepos.filter { appState.settings.hasOverride(for: $0) }
+    }
+
+    private var addableRepos: [RepoRef] {
+        appState.settings.watchedRepos.filter { !appState.settings.hasOverride(for: $0) }
+    }
+
     private var notificationsTab: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
@@ -134,25 +142,45 @@ struct SettingsView: View {
 
                 if !appState.settings.watchedRepos.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("PER-REPO OVERRIDES")
-                                .font(.caption)
-                                .textCase(.uppercase)
-                                .foregroundStyle(.secondary)
-                            Text("These repositories ignore the settings above.")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("PER-REPO OVERRIDES")
+                                    .font(.caption)
+                                    .textCase(.uppercase)
+                                    .foregroundStyle(.secondary)
+                                Text("These repositories ignore the settings above.")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Menu {
+                                ForEach(addableRepos) { repo in
+                                    Button(repo.fullName) {
+                                        appState.settings.setRepoRule(RepoNotificationRule(), for: repo)
+                                    }
+                                }
+                            } label: {
+                                Label("Add repo", systemImage: "plus")
+                                    .font(.caption)
+                            }
+                            .disabled(addableRepos.isEmpty)
+                            .menuStyle(.borderlessButton)
+                            .fixedSize()
                         }
 
-                        VStack(spacing: 0) {
-                            ForEach(Array(appState.settings.watchedRepos.enumerated()), id: \.element.id) { index, repo in
-                                if index > 0 { Divider() }
-                                RepoRuleRow(repo: repo)
+                        if !overriddenRepos.isEmpty {
+                            VStack(spacing: 0) {
+                                ForEach(Array(overriddenRepos.enumerated()), id: \.element.id) { index, repo in
+                                    if index > 0 { Divider() }
+                                    RepoRuleRow(repo: repo) {
+                                        appState.settings.removeRepoRule(for: repo)
+                                    }
+                                }
                             }
+                            .padding(14)
+                            .background(Color.gray.opacity(0.15))
+                            .cornerRadius(10)
                         }
-                        .padding(14)
-                        .background(Color.gray.opacity(0.15))
-                        .cornerRadius(10)
                     }
                     .disabled(!appState.settings.notificationsEnabled)
                     .opacity(appState.settings.notificationsEnabled ? 1 : 0.4)
@@ -271,6 +299,7 @@ struct SettingsView: View {
 private struct RepoRuleRow: View {
     @EnvironmentObject var appState: AppState
     let repo: RepoRef
+    let onRemove: () -> Void
 
     var body: some View {
         let rule = appState.settings.repoRule(for: repo)
@@ -295,6 +324,12 @@ private struct RepoRuleRow: View {
             }
             .pickerStyle(.segmented)
             .frame(width: 200)
+
+            Button(action: onRemove) {
+                Image(systemName: "xmark")
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
         }
         .padding(.vertical, 8)
     }

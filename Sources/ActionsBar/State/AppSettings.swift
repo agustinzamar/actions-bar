@@ -72,8 +72,16 @@ final class AppSettings: ObservableObject {
         repoRules[repo.id] ?? RepoNotificationRule()
     }
 
+    func hasOverride(for repo: RepoRef) -> Bool {
+        repoRules[repo.id] != nil
+    }
+
     func setRepoRule(_ rule: RepoNotificationRule, for repo: RepoRef) {
         repoRules[repo.id] = rule
+    }
+
+    func removeRepoRule(for repo: RepoRef) {
+        repoRules.removeValue(forKey: repo.id)
     }
 
     func addRepo(_ repo: RepoRef) {
