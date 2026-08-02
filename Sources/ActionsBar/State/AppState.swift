@@ -38,6 +38,21 @@ final class AppState: ObservableObject {
             .sink { [weak self] _, _ in self?.restartPolling() }
             .store(in: &cancellables)
 
+        // settings/auth/poller are separate ObservableObjects; views only hold
+        // this AppState as their @EnvironmentObject, so forward their change
+        // notifications or the UI never redraws when nested state mutates.
+        settings.objectWillChange
+            .sink { [weak self] in self?.objectWillChange.send() }
+            .store(in: &cancellables)
+
+        auth.objectWillChange
+            .sink { [weak self] in self?.objectWillChange.send() }
+            .store(in: &cancellables)
+
+        poller.objectWillChange
+            .sink { [weak self] in self?.objectWillChange.send() }
+            .store(in: &cancellables)
+
         if isSignedIn {
             restartPolling()
         }
