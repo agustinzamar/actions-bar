@@ -6,9 +6,9 @@ struct SettingsView: View {
 
     var body: some View {
         TabView {
-            reposTab.tabItem { Text("Repos") }
-            notificationsTab.tabItem { Text("Notifications") }
-            accountTab.tabItem { Text("Account") }
+            reposTab.tabItem { Label("Repos", systemImage: "folder.fill") }
+            notificationsTab.tabItem { Label("Notifications", systemImage: "bell.fill") }
+            accountTab.tabItem { Label("Account", systemImage: "person.crop.circle.fill") }
         }
         .padding(20)
         .frame(width: 420, height: 340)
