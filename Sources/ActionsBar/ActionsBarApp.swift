@@ -3,12 +3,10 @@ import SwiftUI
 @main
 struct ActionsBarApp: App {
     @StateObject private var appState = AppState()
+    @AppStorage("showMenuBarIcon") private var showMenuBarIcon = true
 
     var body: some Scene {
-        MenuBarExtra(isInserted: Binding(
-            get: { appState.settings.showMenuBarIcon },
-            set: { appState.settings.showMenuBarIcon = $0 }
-        )) {
+        MenuBarExtra(isInserted: $showMenuBarIcon) {
             MenuContentView()
                 .environmentObject(appState)
         } label: {
