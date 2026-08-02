@@ -6,9 +6,10 @@ final class AppState: ObservableObject {
     var settings = AppSettings()
     var auth = PATAuth()
     @Published private(set) var isSignedIn: Bool
+    private var cachedToken: String?
 
     private(set) lazy var poller: RunsPoller = .init(
-        client: GitHubClient(token: { KeychainStore.loadToken() }),
+        client: GitHubClient(token: { [weak self] in self?.cachedToken }),
         onTransition: { [weak self] repo, from, to in
             guard let self else { return }
             NotificationManager.shared.notifyIfNeeded(repo: repo, from: from, to: to, settings: settings)
@@ -22,12 +23,14 @@ final class AppState: ObservableObject {
     }
 
     init() {
-        isSignedIn = KeychainStore.loadToken() != nil
+        cachedToken = KeychainStore.loadToken()
+        isSignedIn = cachedToken != nil
         NotificationManager.shared.requestAuthorization()
 
         auth.$state
             .sink { [weak self] state in
                 guard let self, state == .success else { return }
+                cachedToken = KeychainStore.loadToken()
                 isSignedIn = true
                 restartPolling()
             }
@@ -69,6 +72,7 @@ final class AppState: ObservableObject {
 
     func signOut() {
         KeychainStore.clear()
+        cachedToken = nil
         isSignedIn = false
         poller.stop()
     }
