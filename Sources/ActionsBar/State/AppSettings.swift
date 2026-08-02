@@ -42,12 +42,20 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(autoFetchEnabled, forKey: Keys.autoFetchEnabled.rawValue) }
     }
 
+    @Published var appearance: AppearanceMode {
+        didSet { UserDefaults.standard.set(appearance.rawValue, forKey: Keys.appearance.rawValue) }
+    }
+
+    @Published var showMenuBarIcon: Bool {
+        didSet { UserDefaults.standard.set(showMenuBarIcon, forKey: Keys.showMenuBarIcon.rawValue) }
+    }
+
     @Published private var repoRules: [String: RepoNotificationRule] {
         didSet { persist(repoRules, key: .repoRules) }
     }
 
     private enum Keys: String {
-        case watchedRepos, pollInterval, enabledEvents, soundEnabled, notificationsEnabled, soundName, respectFocusMode, repoRules, autoFetchEnabled
+        case watchedRepos, pollInterval, enabledEvents, soundEnabled, notificationsEnabled, soundName, respectFocusMode, repoRules, autoFetchEnabled, appearance, showMenuBarIcon
     }
 
     init() {
@@ -61,6 +69,8 @@ final class AppSettings: ObservableObject {
         soundName = defaults.object(forKey: Keys.soundName.rawValue) as? String ?? "Pop"
         respectFocusMode = defaults.object(forKey: Keys.respectFocusMode.rawValue) as? Bool ?? true
         autoFetchEnabled = defaults.object(forKey: Keys.autoFetchEnabled.rawValue) as? Bool ?? true
+        appearance = AppearanceMode(rawValue: defaults.string(forKey: Keys.appearance.rawValue) ?? "") ?? .system
+        showMenuBarIcon = defaults.object(forKey: Keys.showMenuBarIcon.rawValue) as? Bool ?? true
         repoRules = Self.load([String: RepoNotificationRule].self, key: .repoRules) ?? [:]
     }
 

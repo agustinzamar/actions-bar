@@ -286,12 +286,29 @@ struct SettingsView: View {
     }
 
     private var accountTab: some View {
-        VStack {
-            if appState.isSignedIn {
-                Button("Sign out", role: .destructive) { appState.signOut() }
-            } else {
-                Button("Sign in with GitHub") { appState.auth.start() }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                SyncStatusRow()
+                Divider()
+                AppearanceRow()
+                Divider()
+                LaunchAtLoginRow()
+                Divider()
+                ShowMenuBarIconRow()
             }
+            .padding(14)
+            .background(Color.gray.opacity(0.15))
+            .cornerRadius(10)
+
+            VStack {
+                if appState.isSignedIn {
+                    Button("Sign out", role: .destructive) { appState.signOut() }
+                } else {
+                    Text("Not signed in — sign in from the menu bar icon.")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.top, 14)
         }
     }
 }

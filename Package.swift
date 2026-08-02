@@ -9,6 +9,11 @@ let package = Package(
             name: "ActionsBar",
             path: "Sources/ActionsBar",
             resources: [.copy("Resources/GitHubMark.png")]
+        ),
+        .testTarget(
+            name: "ActionsBarTests",
+            dependencies: ["ActionsBar"],
+            path: "Tests/ActionsBarTests"
         )
     ]
 )
