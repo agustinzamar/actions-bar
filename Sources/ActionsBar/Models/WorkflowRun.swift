@@ -18,7 +18,9 @@ struct WorkflowRun: Codable, Identifiable {
         case updatedAt = "updated_at"
     }
 
-    var runStatus: RunStatus { RunStatus(status: status, conclusion: conclusion) }
+    var runStatus: RunStatus {
+        RunStatus(status: status, conclusion: conclusion)
+    }
 }
 
 /// Latest known state for one watched repo, tracked by the poller.
@@ -27,6 +29,11 @@ struct RepoRunState: Identifiable {
     var latestRun: WorkflowRun?
     var lastError: String?
 
-    var id: String { repo.id }
-    var status: RunStatus { latestRun?.runStatus ?? .unknown }
+    var id: String {
+        repo.id
+    }
+
+    var status: RunStatus {
+        latestRun?.runStatus ?? .unknown
+    }
 }

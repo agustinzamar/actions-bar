@@ -5,8 +5,13 @@ struct RepoRef: Codable, Identifiable, Hashable {
     var owner: String
     var name: String
 
-    var id: String { fullName }
-    var fullName: String { "\(owner)/\(name)" }
+    var id: String {
+        fullName
+    }
+
+    var fullName: String {
+        "\(owner)/\(name)"
+    }
 
     /// Parses "owner/name". Returns nil if malformed.
     init?(fullName raw: String) {

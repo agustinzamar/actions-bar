@@ -38,7 +38,7 @@ struct SettingsView: View {
                 Text("Poll every")
                 Stepper(
                     value: $appState.settings.pollInterval,
-                    in: Config.minPollInterval...Config.maxPollInterval,
+                    in: Config.minPollInterval ... Config.maxPollInterval,
                     step: 15
                 ) {
                     Text("\(Int(appState.settings.pollInterval))s")

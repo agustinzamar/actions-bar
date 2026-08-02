@@ -1,5 +1,5 @@
-import SwiftUI
 import AppKit
+import SwiftUI
 
 /// Black pill button matching GitHub's "Sign in with GitHub" styling.
 struct GitHubSignInButton: View {
@@ -29,7 +29,8 @@ struct GitHubSignInButton: View {
 
     private var githubMark: Image {
         if let url = Bundle.module.url(forResource: "GitHubMark", withExtension: "png"),
-           let nsImage = NSImage(contentsOf: url) {
+           let nsImage = NSImage(contentsOf: url)
+        {
             return Image(nsImage: nsImage)
         }
         return Image(systemName: "cat.fill")

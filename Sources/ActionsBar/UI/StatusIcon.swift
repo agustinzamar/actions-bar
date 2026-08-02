@@ -10,21 +10,21 @@ struct StatusIcon: View {
 
     private var symbolName: String {
         switch status {
-        case .success: return "checkmark.circle.fill"
-        case .failure: return "xmark.circle.fill"
-        case .inProgress: return "circle.dotted"
-        case .cancelled: return "minus.circle.fill"
-        case .unknown: return "circle"
+        case .success: "checkmark.circle.fill"
+        case .failure: "xmark.circle.fill"
+        case .inProgress: "circle.dotted"
+        case .cancelled: "minus.circle.fill"
+        case .unknown: "circle"
         }
     }
 
     private var tint: Color {
         switch status {
-        case .success: return .green
-        case .failure: return .red
-        case .inProgress: return .yellow
-        case .cancelled: return .gray
-        case .unknown: return .secondary
+        case .success: .green
+        case .failure: .red
+        case .inProgress: .yellow
+        case .cancelled: .gray
+        case .unknown: .secondary
         }
     }
 }

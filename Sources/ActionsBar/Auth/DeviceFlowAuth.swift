@@ -1,6 +1,6 @@
-import Foundation
 import AppKit
 import Combine
+import Foundation
 
 /// Implements GitHub's OAuth Device Flow.
 /// https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#device-flow
@@ -8,7 +8,7 @@ enum DeviceFlowError: Error, LocalizedError {
     case server(String)
     var errorDescription: String? {
         switch self {
-        case .server(let body): return "GitHub rejected the request: \(body)"
+        case let .server(body): "GitHub rejected the request: \(body)"
         }
     }
 }

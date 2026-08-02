@@ -11,11 +11,11 @@ enum RunStatus: String, Codable, Comparable {
     /// Ordering used to pick the "worst" status across repos for the menu bar icon.
     private var severity: Int {
         switch self {
-        case .failure: return 4
-        case .inProgress: return 3
-        case .cancelled: return 2
-        case .unknown: return 1
-        case .success: return 0
+        case .failure: 4
+        case .inProgress: 3
+        case .cancelled: 2
+        case .unknown: 1
+        case .success: 0
         }
     }
 

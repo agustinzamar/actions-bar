@@ -36,20 +36,20 @@ final class NotificationManager {
 
     private func event(from: RunStatus, to: RunStatus) -> NotificationEvent? {
         switch (from, to) {
-        case (_, .failure) where from != .failure: return .failure
-        case (.failure, .success): return .fixed
-        case (_, .success) where from != .success: return .success
-        case (_, .cancelled) where from != .cancelled: return .cancelled
-        default: return nil
+        case (_, .failure) where from != .failure: .failure
+        case (.failure, .success): .fixed
+        case (_, .success) where from != .success: .success
+        case (_, .cancelled) where from != .cancelled: .cancelled
+        default: nil
         }
     }
 
     private func body(for event: NotificationEvent) -> String {
         switch event {
-        case .failure: return "Workflow run failed"
-        case .fixed: return "Workflow run fixed"
-        case .success: return "Workflow run succeeded"
-        case .cancelled: return "Workflow run cancelled"
+        case .failure: "Workflow run failed"
+        case .fixed: "Workflow run fixed"
+        case .success: "Workflow run succeeded"
+        case .cancelled: "Workflow run cancelled"
         }
     }
 }

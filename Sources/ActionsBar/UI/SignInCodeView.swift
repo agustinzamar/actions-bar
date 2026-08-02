@@ -1,5 +1,5 @@
-import SwiftUI
 import AppKit
+import SwiftUI
 
 /// Shown in its own real window (not the menu bar popover) because the popover
 /// auto-dismisses the instant focus shifts to the browser during device flow.
@@ -36,7 +36,7 @@ struct SignInCodeView: View {
             case .success:
                 Label("Signed in!", systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
-            case .failed(let message):
+            case let .failed(message):
                 Label(message, systemImage: "xmark.circle.fill")
                     .foregroundStyle(.red)
                     .multilineTextAlignment(.center)
